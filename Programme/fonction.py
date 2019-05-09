@@ -4,19 +4,47 @@ Created on Wed May  8 14:11:54 2019
 
 @author: vwork
 """
-import os
+import serial.tools.list_ports
 from tkinter import messagebox
-#------Arduino Connection-------#
-def CheckPort(): #Prototype bin_test-serial3.py
-    """CETTE FONCTION VÉRIFIE QUE LA CARTE DE CONTRÔLE EST CONNECTÉE"""
-    verif = False
-    while verif == False:
-        try:
-            Listport = os.popen('python -m serial.tools.list_ports').readlines()
-            os.system('exit')
-            assert len(Listport)!= 0
-            verif = True
-        except AssertionError:
-            messagebox.showerror("Erreur de connection", "La carte n'est reconnue sur aucun port de l'ordinateur. Veuillez vérifier la connection et appuyer sur OK")
 
-    return Listport[0].split(' ')[0]
+class Port:
+    def __init__(self): #Variable
+        self.portsFound = Port.get_ports()
+        self.baud = 9600
+        
+        
+    def get_ports():
+        """Renvoie la liste des périphériques connectés sur l'ordinateur"""
+        ports = serial.tools.list_ports.comports()
+        
+        return ports
+    
+    def linkArduino(self):
+        """Tentative de connection à la carte arduino"""
+        nameFound = False
+        commPort = 'None'
+
+        while nameFound == False:
+            try:
+                numConnection = len(self.portsFound) #Nombre de périphérique détecté
+                assert numConnection != 0 #Vérifie que la liste n'est pas nul
+    
+                for i in range(0,numConnection): #Cherche la carte
+                    port = self.portsFound[i] #Sélectionne le port
+                    strPort = str(port) #Convertie en chaine de caractère
+                    if 'Arduino' in strPort: #Vérifie la présence de la carte
+                        splitPort = strPort.split(' ') #Sépare les élements de la chaine de caractère
+                        commPort = (splitPort[0]) #Récupère le nom du port où est connecté la carte
+                
+                assert commPort != 'None'        
+                nameFound = True #On a trouver le nom du port de l'arduino
+            
+            except AssertionError: #Affiche un message d'erreur si la carte n'est reconnue sur aucun port
+                messagebox.showerror("Erreur de connection", "La carte n'est reconnue sur aucun port de l'ordinateur. Veuillez vérifier la connection et appuyer sur OK")
+        
+        #On se connecter au port de l'arduino :
+        connect = serial.Serial(commPort,baudrate = self.baud, timeout=1)
+        print('Connected to '+commPort)
+        return connect #Port de l'arduino
+            
+                    
