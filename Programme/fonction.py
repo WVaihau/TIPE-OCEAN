@@ -4,9 +4,11 @@ Created on Wed May  8 14:11:54 2019
 
 @author: vwork
 """
-import serial.tools.list_ports
+import serial
+import matplotlib.pyplot as plt
 from tkinter import messagebox
 
+#-----Connection Arduino-----#
 class Port:
     def __init__(self): #Variable
         self.portsFound = Port.get_ports()
@@ -47,4 +49,11 @@ class Port:
         print('Connected to '+commPort)
         return connect #Port de l'arduino
             
-                    
+#-----Affichage Graphique-----#                    
+def plotValues(values):
+    plt.title('Résultat capteur Force')
+    plt.grid(True)
+    plt.ylabel('''Force (en N)''')
+    plt.ylim(0,1023)
+    plt.plot(values, 'rx-', label='Force')
+    plt.legend(loc='upper right')
