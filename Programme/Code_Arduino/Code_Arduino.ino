@@ -1,9 +1,14 @@
-void setup() {
-  // put your setup code here, to run once:
+// Envoie les information du capteur à python
+const int analogIn = A0;
+int analogVal = 0;
 
+void setup() {
+  Serial.begin(9600);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
 
+  analogVal = analogRead(analogIn);
+  Serial.println(analogVal);
+  delay(100);
 }
